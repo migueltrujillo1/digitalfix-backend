@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: ms-digitalfix-bff
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://sts.windows.net/${AZURE_TENANT_ID}/
+
+security:
+  jwt:
+    audience: ${AZURE_AUDIENCE:api://742b8e08-98d5-4c39-b8a9-8d57f9a892eb}
+
+services:
+  workorders-url: ${WORKORDERS_URL:http://localhost:8081}
+  catalog-url: ${CATALOG_URL:http://localhost:8082}
+  report-url: ${REPORT_URL:http://localhost:8083}
+
+server:
+  port: 8080
