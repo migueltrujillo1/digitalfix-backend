@@ -1,6 +1,6 @@
-package ev1_backend.repository;
+package com.digitalfix.workorders.repository;
 
-import ev1_backend.entity.WorkOrder;
+import com.digitalfix.workorders.entity.WorkOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

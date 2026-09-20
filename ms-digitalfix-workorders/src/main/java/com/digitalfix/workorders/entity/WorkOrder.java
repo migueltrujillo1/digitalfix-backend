@@ -1,4 +1,4 @@
-package ev1_backend.entity;
+package com.digitalfix.workorders.entity;
 
 import jakarta.persistence.*;
 

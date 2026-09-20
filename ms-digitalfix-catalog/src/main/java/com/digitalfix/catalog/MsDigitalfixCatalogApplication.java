@@ -1,13 +1,13 @@
-package ev1_backend;
+package com.digitalfix.catalog;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Ev1BackendApplication {
+public class MsDigitalfixCatalogApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Ev1BackendApplication.class, args);
+		SpringApplication.run(MsDigitalfixCatalogApplication.class, args);
 	}
 
 }

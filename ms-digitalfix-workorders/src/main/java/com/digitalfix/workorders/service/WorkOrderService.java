@@ -1,7 +1,7 @@
-package ev1_backend.service;
+package com.digitalfix.workorders.service;
 
-import ev1_backend.entity.WorkOrder;
-import ev1_backend.repository.WorkOrderRepository;
+import com.digitalfix.workorders.entity.WorkOrder;
+import com.digitalfix.workorders.repository.WorkOrderRepository;
 
 import org.springframework.stereotype.Service;
 

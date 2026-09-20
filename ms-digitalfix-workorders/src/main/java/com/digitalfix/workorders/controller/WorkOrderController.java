@@ -1,7 +1,7 @@
-package ev1_backend.controller;
+package com.digitalfix.workorders.controller;
 
-import ev1_backend.entity.WorkOrder;
-import ev1_backend.service.WorkOrderService;
+import com.digitalfix.workorders.entity.WorkOrder;
+import com.digitalfix.workorders.service.WorkOrderService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
