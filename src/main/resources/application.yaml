@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: ev1-backend
+
+  cloud:
+    azure:
+      active-directory:
+        enabled: true
+        profile:
+          tenant-id: ${AZURE_TENANT_ID}
+        credential:
+          client-id: ${AZURE_CLIENT_ID}
+        app-id-uri: ${AZURE_APP_ID_URI}
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
