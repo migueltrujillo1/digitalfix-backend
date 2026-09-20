@@ -1,0 +1,11 @@
+package com.digitalfix.report;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class MsDigitalfixReportApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(MsDigitalfixReportApplication.class, args);
+    }
+}
