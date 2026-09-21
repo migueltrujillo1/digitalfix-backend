@@ -1,12 +1,12 @@
 package com.digitalfix.report.dto;
 
 public record KpiResponse(
-    String range,
-    long totalWorkOrders,
-    long created,
-    long assigned,
-    long inTransit,
-    long inProgress,
-    long closed,
-    long cancelled
+    String periodo,
+    long totalOrdenes,
+    long creadas,
+    long asignadas,
+    long enDesplazamiento,
+    long enEjecucion,
+    long cerradas,
+    long canceladas
 ) {}

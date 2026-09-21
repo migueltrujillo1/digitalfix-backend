@@ -18,10 +18,10 @@ public class CatalogService {
 
     public CatalogItem create(CatalogItem item) {
 
-        if (!item.getType().equals("SERVICE")
-                && !item.getType().equals("SPARE_PART")) {
+        if (item.getTypeInterno() == null || (!item.getTypeInterno().equals("SERVICE")
+                && !item.getTypeInterno().equals("SPARE_PART"))) {
             throw new IllegalArgumentException(
-                    "El tipo debe ser SERVICE o SPARE_PART"
+                    "El tipo debe ser SERVICIO o REPUESTO"
             );
         }
 
@@ -39,7 +39,9 @@ public class CatalogService {
     public List<CatalogItem> findAll(String type) {
 
         if (type != null && !type.isBlank()) {
-            return repository.findByType(type);
+            String tipoInterno = type.equalsIgnoreCase("SERVICIO") ? "SERVICE" :
+                    type.equalsIgnoreCase("REPUESTO") ? "SPARE_PART" : type;
+            return repository.findByType(tipoInterno);
         }
 
         return repository.findAll();

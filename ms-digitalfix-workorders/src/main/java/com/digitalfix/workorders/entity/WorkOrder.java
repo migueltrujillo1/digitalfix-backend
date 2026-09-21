@@ -1,6 +1,7 @@
 package com.digitalfix.workorders.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 
@@ -51,34 +52,42 @@ public class WorkOrder {
         this.id = id;
     }
 
+    @JsonProperty("descripcion")
     public String getDescription() {
         return description;
     }
 
+    @JsonProperty("descripcion")
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @JsonProperty("estado")
     public String getStatus() {
         return status;
     }
 
+    @JsonProperty("estado")
     public void setStatus(String status) {
         this.status = status;
     }
 
+    @JsonProperty("tecnico")
     public String getTechnician() {
         return technician;
     }
 
+    @JsonProperty("tecnico")
     public void setTechnician(String technician) {
         this.technician = technician;
     }
 
+    @JsonProperty("fechaCreacion")
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
+    @JsonProperty("fechaCreacion")
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }

@@ -2,6 +2,12 @@ spring:
   application:
     name: ms-digitalfix-workorders
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://sts.windows.net/${AZURE_TENANT_ID}/
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -11,12 +17,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: https://sts.windows.net/${AZURE_TENANT_ID}/
+    properties:
+      hibernate:
+        format_sql: true
 
 server:
   port: 8081

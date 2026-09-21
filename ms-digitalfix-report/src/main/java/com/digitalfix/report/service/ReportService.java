@@ -21,7 +21,12 @@ public class ReportService {
             default -> throw new IllegalArgumentException("range debe ser last24h, last7d o last30d");
         };
         List<WorkOrderReportView> orders = repository.findByCreatedAtGreaterThanEqual(from);
-        return new KpiResponse(normalizedRange, orders.size(), count(orders,"CREADA"), count(orders,"ASIGNADA"),
+        String periodo = switch (normalizedRange) {
+            case "last7d" -> "ULTIMOS_7_DIAS";
+            case "last30d" -> "ULTIMOS_30_DIAS";
+            default -> "ULTIMAS_24_HORAS";
+        };
+        return new KpiResponse(periodo, orders.size(), count(orders,"CREADA"), count(orders,"ASIGNADA"),
             count(orders,"EN_DESPLAZAMIENTO"), count(orders,"EN_EJECUCIÓN"), count(orders,"CERRADA"), count(orders,"CANCELADA"));
     }
 

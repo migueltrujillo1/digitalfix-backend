@@ -59,11 +59,11 @@ public class WorkOrderController {
             @PathVariable Long id,
             @RequestBody StatusRequest request) {
 
-        return service.updateStatus(id, request.status())
+        return service.updateStatus(id, request.estado())
                 .map(ResponseEntity::ok)
                 .orElseGet(() ->
                         ResponseEntity.notFound().build());
     }
 
-    public record StatusRequest(String status) {}
+    public record StatusRequest(String estado) {}
 }
