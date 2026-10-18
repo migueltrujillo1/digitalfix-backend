@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: ms-digitalfix-rabbit-admin
+  rabbitmq:
+    addresses: ${RABBITMQ_ADDRESSES:rabbitmq-node1:5672,rabbitmq-node2:5672}
+    username: ${RABBITMQ_USERNAME:digitalfix}
+    password: ${RABBITMQ_PASSWORD}
+server:
+  address: 127.0.0.1
+  port: 8085
+digitalfix:
+  admin:
+    allowed-prefix: digitalfix.test.

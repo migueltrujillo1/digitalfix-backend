@@ -16,16 +16,19 @@ public class BffController {
     private final String workordersUrl;
     private final String catalogUrl;
     private final String reportUrl;
+    private final String notifyUrl;
 
     public BffController(
             ProxyService proxyService,
             @Value("${services.workorders-url}") String workordersUrl,
             @Value("${services.catalog-url}") String catalogUrl,
-            @Value("${services.report-url}") String reportUrl) {
+            @Value("${services.report-url}") String reportUrl,
+            @Value("${services.notify-url}") String notifyUrl) {
         this.proxyService = proxyService;
         this.workordersUrl = workordersUrl;
         this.catalogUrl = catalogUrl;
         this.reportUrl = reportUrl;
+        this.notifyUrl = notifyUrl;
     }
 
     @PreAuthorize("hasAuthority('SCOPE_access_as_user')")
@@ -45,6 +48,13 @@ public class BffController {
     public ResponseEntity<byte[]> report(HttpServletRequest request) throws Exception {
         return forward(request, reportUrl, "/api/report");
     }
+
+    @PreAuthorize("hasAuthority('SCOPE_access_as_user')")
+    @RequestMapping("/api/audit/**")
+    public ResponseEntity<byte[]> audit(HttpServletRequest request) throws Exception {
+        return forward(request, notifyUrl, "/api/audit");
+    }
+
 
     private ResponseEntity<byte[]> forward(HttpServletRequest request, String baseUrl, String prefix) throws Exception {
         String requestUri = request.getRequestURI();

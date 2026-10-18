@@ -15,6 +15,11 @@ services:
   workorders-url: ${WORKORDERS_URL:http://localhost:8081}
   catalog-url: ${CATALOG_URL:http://localhost:8082}
   report-url: ${REPORT_URL:http://localhost:8083}
+  notify-url: ${NOTIFY_URL:http://localhost:8084}
+
+digitalfix:
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
 
 server:
   port: 8080

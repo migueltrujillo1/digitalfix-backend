@@ -1,8 +1,11 @@
+
 package com.digitalfix.workorders.service;
 
 import com.digitalfix.workorders.entity.WorkOrder;
 import com.digitalfix.workorders.repository.WorkOrderRepository;
+import com.digitalfix.workorders.messaging.OrderEventPublisher;
 
+import org.springframework.amqp.AmqpException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,13 +15,33 @@ import java.util.Optional;
 public class WorkOrderService {
 
     private final WorkOrderRepository repository;
+    private final OrderEventPublisher eventPublisher;
 
-    public WorkOrderService(WorkOrderRepository repository) {
+    public WorkOrderService(
+            WorkOrderRepository repository,
+            OrderEventPublisher eventPublisher) {
+
         this.repository = repository;
+        this.eventPublisher = eventPublisher;
     }
 
     public WorkOrder create(WorkOrder workOrder) {
-        return repository.save(workOrder);
+
+        // guardar la orden en PostgreSQL RDS
+        WorkOrder saved = repository.save(workOrder);
+
+        // publicar evento en RabbitMQ
+        try {
+            eventPublisher.publishOrderCreated(saved.getId());
+        } catch (AmqpException e) {
+            // si RabbitMQ no está disponible.
+            System.err.println(
+                "[RABBITMQ] No se pudo publicar el evento de la orden "
+                + saved.getId() + ": " + e.getMessage()
+            );
+        }
+
+        return saved;
     }
 
     public Optional<WorkOrder> findById(Long id) {
@@ -36,7 +59,8 @@ public class WorkOrderService {
 
     public Optional<WorkOrder> updateStatus(Long id, String status) {
 
-        Optional<WorkOrder> optionalWorkOrder = repository.findById(id);
+        Optional<WorkOrder> optionalWorkOrder =
+                repository.findById(id);
 
         if (optionalWorkOrder.isEmpty()) {
             return Optional.empty();

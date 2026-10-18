@@ -1,25 +1,38 @@
 spring:
-  application:
-    name: ms-digitalfix-workorders
+    application:
+        name: ms-digitalfix-workorders
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: https://sts.windows.net/${AZURE_TENANT_ID}/
+    datasource:
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+    rabbitmq:
+        addresses: ${RABBITMQ_ADDRESSES:rabbitmq-node1:5672,rabbitmq-node2:5672}
+        username: ${RABBITMQ_USERNAME:digitalfix}
+        password: ${RABBITMQ_PASSWORD}
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: https://sts.windows.net/${AZURE_TENANT_ID}/
-
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+digitalfix:
+    messaging:
+        orders:
+            exchange: digitalfix.orders.exchange
+            routing-key: order.created
+        events:
+            exchange: digitalfix.events.topic
+        notifications:
+            routing-key: notification.created
+        audit:
+            routing-key: audit.created
 
 server:
-  port: 8081
+    port: 8081

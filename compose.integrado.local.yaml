@@ -1,0 +1,79 @@
+name: digitalfix-integrado
+
+services:
+  bff:
+    build: ./ms-digitalfix-bff
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:?Falta AZURE_TENANT_ID}
+      WORKORDERS_URL: http://workorders:8081
+      CATALOG_URL: http://catalog:8082
+      REPORT_URL: http://report:8083
+      NOTIFY_URL: http://notify:8084
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:-http://localhost:5173}
+    networks: [app]
+
+  workorders:
+    build: ./ms-digitalfix-workorders
+    environment:
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:?Falta AZURE_TENANT_ID}
+      DB_URL: ${DB_URL:-jdbc:postgresql://host.docker.internal:5432/digitalfix}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD}
+      RABBITMQ_ADDRESSES: "rabbitmq-node1:5672,rabbitmq-node2:5672"
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-digitalfix}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?Falta RABBITMQ_PASSWORD}
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    networks: [app, rabbitmq_cluster]
+
+  catalog:
+    build: ./ms-digitalfix-catalog
+    environment:
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:?Falta AZURE_TENANT_ID}
+      DB_URL: ${DB_URL:-jdbc:postgresql://host.docker.internal:5432/digitalfix}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD}
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    networks: [app]
+
+  report:
+    build: ./ms-digitalfix-report
+    environment:
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:?Falta AZURE_TENANT_ID}
+      DB_URL: ${DB_URL:-jdbc:postgresql://host.docker.internal:5432/digitalfix}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD}
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    networks: [app]
+
+  notify:
+    build: ./ms-digitalfix-notify
+    environment:
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:?Falta AZURE_TENANT_ID}
+      DB_URL: ${DB_URL:-jdbc:postgresql://host.docker.internal:5432/digitalfix}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD}
+      RABBITMQ_ADDRESSES: "rabbitmq-node1:5672,rabbitmq-node2:5672"
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-digitalfix}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?Falta RABBITMQ_PASSWORD}
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    networks: [app, rabbitmq_cluster]
+
+  rabbit-admin:
+    build: ./ms-digitalfix-rabbit-admin
+    ports:
+      - "127.0.0.1:8085:8085"
+    environment:
+      RABBITMQ_ADDRESSES: "rabbitmq-node1:5672,rabbitmq-node2:5672"
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-digitalfix}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?Falta RABBITMQ_PASSWORD}
+      SERVER_ADDRESS: 0.0.0.0
+    networks: [rabbitmq_cluster]
+
+networks:
+  app:
+    driver: bridge
+  rabbitmq_cluster:
+    external: true
+    name: digitalfix-rabbitmq-cluster_rabbitmq_cluster

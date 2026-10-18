@@ -1,0 +1,54 @@
+spring:
+    application:
+        name: ms-digitalfix-notify
+    datasource:
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+    jpa:
+        hibernate:
+            ddl-auto: update
+        open-in-view: false
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: https://sts.windows.net/${AZURE_TENANT_ID}/
+    rabbitmq:
+        addresses: ${RABBITMQ_ADDRESSES:rabbitmq-node1:5672,rabbitmq-node2:5672}
+        username: ${RABBITMQ_USERNAME:digitalfix}
+        password: ${RABBITMQ_PASSWORD}
+        listener:
+            simple:
+                acknowledge-mode: manual
+                prefetch: 1
+
+digitalfix:
+    messaging:
+        orders:
+            exchange: digitalfix.orders.exchange
+            queue: digitalfix.orders.queue
+            routing-key: order.created
+            dead-letter-exchange: digitalfix.orders.dlx
+            dead-letter-queue: digitalfix.orders.dlq
+            dead-letter-routing-key: order.failed
+        events:
+            exchange: digitalfix.events.topic
+        notifications:
+            queue: digitalfix.notifications.queue
+            routing-key: notification.created
+            dead-letter-exchange: digitalfix.notifications.dlx
+            dead-letter-queue: digitalfix.notifications.dlq
+            dead-letter-routing-key: notification.failed
+        audit:
+            queue: digitalfix.audit.queue
+            routing-key: audit.created
+            dead-letter-exchange: digitalfix.audit.dlx
+            dead-letter-queue: digitalfix.audit.dlq
+            dead-letter-routing-key: audit.failed
+        retry:
+            max-attempts: 3
+            delay-ms: 1000
+
+server:
+    port: 8084

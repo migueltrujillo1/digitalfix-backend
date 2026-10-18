@@ -19,30 +19,38 @@ import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    // Seguridad del BFF
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+            // Deshabilita CSRF porque utilizamos JWT Bearer
             .csrf(csrf -> csrf.disable())
+
+            // Habilita CORS con la configuración definida abajo
+            .cors(Customizer.withDefaults())
 
             .authorizeHttpRequests(auth -> auth
 
-                // permite el preflight CORS del navegador sin JWT
+                // Permite solicitudes preflight sin autenticación
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // los endpoints de la API requieren autenticación
+                // Protege todos los endpoints de la API
                 .requestMatchers("/api/**").authenticated()
 
-                // otra peticion pide autentificacion 
+                // Las demás solicitudes también requieren autenticación
                 .anyRequest().authenticated()
             )
 
-            // valida el JWT enviado como Bearer Token
+            // Autenticación mediante JWT de Azure AD
             .oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(Customizer.withDefaults())
             );
@@ -50,19 +58,63 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Configuración CORS para permitir peticiones desde React
+    @Bean
+    CorsConfigurationSource corsConfigurationSource(
+            @Value("${digitalfix.cors.allowed-origin:http://localhost:5173}")
+            String allowedOrigin) {
+
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Origen permitido: frontend React
+        config.setAllowedOrigins(List.of(allowedOrigin));
+
+        // Métodos HTTP permitidos
+        config.setAllowedMethods(List.of(
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "OPTIONS"
+        ));
+
+        // Encabezados permitidos
+        config.setAllowedHeaders(List.of(
+            "Authorization",
+            "Content-Type",
+            "Accept"
+        ));
+
+        // Tiempo de caché de solicitudes preflight
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        // Aplica CORS a todos los endpoints
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
+
+    // Validación del JWT de Azure AD
     @Bean
     JwtDecoder jwtDecoder(
-            @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String issuer,
-            @Value("${security.jwt.audience}") String audience) {
+            @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+            String issuer,
+
+            @Value("${security.jwt.audience}")
+            String audience) {
 
         NimbusJwtDecoder decoder =
                 (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(issuer);
 
-        // valida issuer, firma, expiracion y tiempos del token
+        // Valida issuer, firma, expiración y tiempos del token
         OAuth2TokenValidator<Jwt> issuerAndTimestamp =
                 JwtValidators.createDefaultWithIssuer(issuer);
 
-        // Valida solo el audience de la API
+        // Verifica que el token esté destinado a nuestra API
         OAuth2TokenValidator<Jwt> audienceValidator = jwt -> {
 
             List<String> audiences = jwt.getAudience();
@@ -80,6 +132,7 @@ public class SecurityConfig {
             return OAuth2TokenValidatorResult.failure(error);
         };
 
+        // Combina ambas validaciones
         decoder.setJwtValidator(
                 new DelegatingOAuth2TokenValidator<>(
                         issuerAndTimestamp,
